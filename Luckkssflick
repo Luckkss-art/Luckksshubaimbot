@@ -1,0 +1,895 @@
+--// LUCKKSS HUB
+--// PRIVATE FPS SYSTEM
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+
+--==================================================
+-- IMAGENS
+--==================================================
+
+local ICON_ID = "rbxassetid://SEU_ID_AQUI"
+local BACKGROUND_ID = "rbxassetid://SEU_ID_AQUI"
+
+--==================================================
+-- CONFIGURAÇÕES
+--==================================================
+
+local Settings = {
+    Aimbot = false,
+    Wallcheck = true,
+
+    LockHead = true,
+
+    ESP = false,
+    Hitbox = false,
+    FOVCircle = true,
+
+    FOV = 150,
+    Smoothness = 0.25,
+    MaxDistance = 1000,
+
+    HitboxSize = 5
+}
+
+--==================================================
+-- GUI
+--==================================================
+
+local Gui = Instance.new("ScreenGui")
+Gui.Name = "LuckkssHub"
+Gui.ResetOnSpawn = false
+Gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+pcall(function()
+    Gui.Parent = game:GetService("CoreGui")
+end)
+
+if not Gui.Parent then
+    Gui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+end
+
+--==================================================
+-- MAIN
+--==================================================
+
+local Main = Instance.new("Frame")
+Main.Size = UDim2.fromOffset(380, 500)
+Main.Position = UDim2.new(0.5, -190, 0.5, -250)
+Main.BackgroundColor3 = Color3.fromRGB(13,13,17)
+Main.BorderSizePixel = 0
+Main.ClipsDescendants = true
+Main.Parent = Gui
+
+local MainCorner = Instance.new("UICorner")
+MainCorner.CornerRadius = UDim.new(0,15)
+MainCorner.Parent = Main
+
+local MainStroke = Instance.new("UIStroke")
+MainStroke.Color = Color3.fromRGB(65,65,80)
+MainStroke.Thickness = 1
+MainStroke.Transparency = 0.2
+MainStroke.Parent = Main
+
+--==================================================
+-- BACKGROUND
+--==================================================
+
+local Background = Instance.new("ImageLabel")
+Background.Size = UDim2.fromScale(1,1)
+Background.BackgroundTransparency = 1
+Background.Image = BACKGROUND_ID
+Background.ImageTransparency = 0.72
+Background.ScaleType = Enum.ScaleType.Crop
+Background.ZIndex = 0
+Background.Parent = Main
+
+local BackgroundCorner = Instance.new("UICorner")
+BackgroundCorner.CornerRadius = UDim.new(0,15)
+BackgroundCorner.Parent = Background
+
+local Overlay = Instance.new("Frame")
+Overlay.Size = UDim2.fromScale(1,1)
+Overlay.BackgroundColor3 = Color3.fromRGB(8,8,11)
+Overlay.BackgroundTransparency = 0.25
+Overlay.BorderSizePixel = 0
+Overlay.ZIndex = 1
+Overlay.Parent = Main
+
+--==================================================
+-- HEADER
+--==================================================
+
+local Header = Instance.new("Frame")
+Header.Size = UDim2.new(1,0,0,72)
+Header.BackgroundTransparency = 1
+Header.ZIndex = 5
+Header.Parent = Main
+
+local Title = Instance.new("TextLabel")
+Title.Position = UDim2.fromOffset(20,12)
+Title.Size = UDim2.new(1,-80,0,28)
+Title.BackgroundTransparency = 1
+Title.Text = "LuckkssHub"
+Title.TextColor3 = Color3.fromRGB(245,245,245)
+Title.TextSize = 22
+Title.Font = Enum.Font.GothamBold
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.ZIndex = 6
+Title.Parent = Header
+
+local Subtitle = Instance.new("TextLabel")
+Subtitle.Position = UDim2.fromOffset(21,40)
+Subtitle.Size = UDim2.new(1,-80,0,18)
+Subtitle.BackgroundTransparency = 1
+Subtitle.Text = "PRIVATE FPS SYSTEM"
+Subtitle.TextColor3 = Color3.fromRGB(140,140,150)
+Subtitle.TextSize = 10
+Subtitle.Font = Enum.Font.GothamMedium
+Subtitle.TextXAlignment = Enum.TextXAlignment.Left
+Subtitle.ZIndex = 6
+Subtitle.Parent = Header
+
+--==================================================
+-- MINIMIZE
+--==================================================
+
+local Minimize = Instance.new("TextButton")
+Minimize.Size = UDim2.fromOffset(40,40)
+Minimize.Position = UDim2.new(1,-53,0,16)
+Minimize.BackgroundColor3 = Color3.fromRGB(27,27,33)
+Minimize.Text = "—"
+Minimize.TextColor3 = Color3.fromRGB(235,235,240)
+Minimize.TextSize = 20
+Minimize.Font = Enum.Font.GothamBold
+Minimize.AutoButtonColor = false
+Minimize.ZIndex = 7
+Minimize.Parent = Header
+
+local MinCorner = Instance.new("UICorner")
+MinCorner.CornerRadius = UDim.new(0,10)
+MinCorner.Parent = Minimize
+
+--==================================================
+-- CONTENT
+--==================================================
+
+local Content = Instance.new("ScrollingFrame")
+Content.Position = UDim2.fromOffset(17,80)
+Content.Size = UDim2.new(1,-34,1,-90)
+Content.BackgroundTransparency = 1
+Content.BorderSizePixel = 0
+Content.ScrollBarThickness = 2
+Content.CanvasSize = UDim2.fromOffset(0,850)
+Content.ZIndex = 5
+Content.Parent = Main
+
+local Layout = Instance.new("UIListLayout")
+Layout.Padding = UDim.new(0,8)
+Layout.SortOrder = Enum.SortOrder.LayoutOrder
+Layout.Parent = Content
+
+--==================================================
+-- SECTION
+--==================================================
+
+local function Section(Text)
+
+    local Label = Instance.new("TextLabel")
+    Label.Size = UDim2.new(1,0,0,23)
+    Label.BackgroundTransparency = 1
+    Label.Text = Text
+    Label.TextColor3 = Color3.fromRGB(120,120,130)
+    Label.TextSize = 10
+    Label.Font = Enum.Font.GothamBold
+    Label.TextXAlignment = Enum.TextXAlignment.Left
+    Label.ZIndex = 6
+    Label.Parent = Content
+
+    return Label
+end
+
+--==================================================
+-- TOGGLE
+--==================================================
+
+local function Toggle(Name,Default,Callback)
+
+    local Button = Instance.new("TextButton")
+    Button.Size = UDim2.new(1,0,0,42)
+    Button.BackgroundColor3 = Color3.fromRGB(22,22,28)
+    Button.Text = ""
+    Button.AutoButtonColor = false
+    Button.ZIndex = 6
+    Button.Parent = Content
+
+    local Corner = Instance.new("UICorner")
+    Corner.CornerRadius = UDim.new(0,9)
+    Corner.Parent = Button
+
+    local Label = Instance.new("TextLabel")
+    Label.Position = UDim2.fromOffset(13,0)
+    Label.Size = UDim2.new(1,-80,1,0)
+    Label.BackgroundTransparency = 1
+    Label.Text = Name
+    Label.TextColor3 = Color3.fromRGB(230,230,235)
+    Label.TextSize = 13
+    Label.Font = Enum.Font.GothamMedium
+    Label.TextXAlignment = Enum.TextXAlignment.Left
+    Label.ZIndex = 7
+    Label.Parent = Button
+
+    local State = Instance.new("TextLabel")
+    State.Size = UDim2.fromOffset(48,24)
+    State.Position = UDim2.new(1,-61,0,9)
+    State.BackgroundColor3 = Default
+        and Color3.fromRGB(70,115,255)
+        or Color3.fromRGB(43,43,50)
+    State.Text = Default and "ON" or "OFF"
+    State.TextColor3 = Color3.fromRGB(245,245,245)
+    State.TextSize = 9
+    State.Font = Enum.Font.GothamBold
+    State.ZIndex = 7
+    State.Parent = Button
+
+    local StateCorner = Instance.new("UICorner")
+    StateCorner.CornerRadius = UDim.new(0,7)
+    StateCorner.Parent = State
+
+    local Enabled = Default
+
+    Button.MouseButton1Click:Connect(function()
+
+        Enabled = not Enabled
+
+        State.Text = Enabled and "ON" or "OFF"
+
+        State.BackgroundColor3 = Enabled
+            and Color3.fromRGB(70,115,255)
+            or Color3.fromRGB(43,43,50)
+
+        Callback(Enabled)
+    end)
+end
+
+--==================================================
+-- SLIDER
+--==================================================
+
+local function Slider(Name,Minimum,Maximum,Default,Callback)
+
+    local Holder = Instance.new("Frame")
+    Holder.Size = UDim2.new(1,0,0,58)
+    Holder.BackgroundColor3 = Color3.fromRGB(22,22,28)
+    Holder.ZIndex = 6
+    Holder.Parent = Content
+
+    local Corner = Instance.new("UICorner")
+    Corner.CornerRadius = UDim.new(0,9)
+    Corner.Parent = Holder
+
+    local Label = Instance.new("TextLabel")
+    Label.Position = UDim2.fromOffset(13,7)
+    Label.Size = UDim2.new(0.6,0,0,18)
+    Label.BackgroundTransparency = 1
+    Label.Text = Name
+    Label.TextColor3 = Color3.fromRGB(215,215,220)
+    Label.TextSize = 11
+    Label.Font = Enum.Font.GothamMedium
+    Label.TextXAlignment = Enum.TextXAlignment.Left
+    Label.ZIndex = 7
+    Label.Parent = Holder
+
+    local Value = Instance.new("TextLabel")
+    Value.Position = UDim2.new(0.65,0,0,7)
+    Value.Size = UDim2.new(0.3,0,0,18)
+    Value.BackgroundTransparency = 1
+    Value.Text = string.format("%.2f",Default)
+    Value.TextColor3 = Color3.fromRGB(150,160,180)
+    Value.TextSize = 11
+    Value.Font = Enum.Font.GothamBold
+    Value.TextXAlignment = Enum.TextXAlignment.Right
+    Value.ZIndex = 7
+    Value.Parent = Holder
+
+    local Bar = Instance.new("Frame")
+    Bar.Position = UDim2.fromOffset(13,35)
+    Bar.Size = UDim2.new(1,-26,0,6)
+    Bar.BackgroundColor3 = Color3.fromRGB(42,42,49)
+    Bar.ZIndex = 7
+    Bar.Parent = Holder
+
+    local BarCorner = Instance.new("UICorner")
+    BarCorner.CornerRadius = UDim.new(1,0)
+    BarCorner.Parent = Bar
+
+    local Fill = Instance.new("Frame")
+    Fill.Size = UDim2.new(
+        (Default-Minimum)/(Maximum-Minimum),
+        0,1,0
+    )
+    Fill.BackgroundColor3 = Color3.fromRGB(75,120,255)
+    Fill.ZIndex = 8
+    Fill.Parent = Bar
+
+    local FillCorner = Instance.new("UICorner")
+    FillCorner.CornerRadius = UDim.new(1,0)
+    FillCorner.Parent = Fill
+
+    local DraggingSlider = false
+
+    local function Update(X)
+
+        local Percent = math.clamp(
+            (X-Bar.AbsolutePosition.X)/Bar.AbsoluteSize.X,
+            0,
+            1
+        )
+
+        local Number =
+            Minimum+(Maximum-Minimum)*Percent
+
+        Fill.Size = UDim2.new(Percent,0,1,0)
+
+        Value.Text = string.format("%.2f",Number)
+
+        Callback(Number)
+    end
+
+    Bar.InputBegan:Connect(function(Input)
+
+        if Input.UserInputType == Enum.UserInputType.MouseButton1
+        or Input.UserInputType == Enum.UserInputType.Touch then
+
+            DraggingSlider = true
+            Update(Input.Position.X)
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(Input)
+
+        if DraggingSlider and (
+            Input.UserInputType == Enum.UserInputType.MouseMovement
+            or Input.UserInputType == Enum.UserInputType.Touch
+        ) then
+
+            Update(Input.Position.X)
+        end
+    end)
+
+    UserInputService.InputEnded:Connect(function(Input)
+
+        if Input.UserInputType == Enum.UserInputType.MouseButton1
+        or Input.UserInputType == Enum.UserInputType.Touch then
+
+            DraggingSlider = false
+        end
+    end)
+end
+
+--==================================================
+-- SETTINGS UI
+--==================================================
+
+Section("TARGETING")
+
+Toggle("AIMBOT",false,function(Value)
+    Settings.Aimbot = Value
+end)
+
+Toggle("WALLCHECK",true,function(Value)
+    Settings.Wallcheck = Value
+end)
+
+Toggle("LOCK HEAD",true,function(Value)
+    Settings.LockHead = Value
+end)
+
+Slider("FOV",50,500,150,function(Value)
+    Settings.FOV = Value
+end)
+
+Slider("SMOOTHNESS",0.05,1,0.25,function(Value)
+    Settings.Smoothness = Value
+end)
+
+Slider("MAX DISTANCE",50,2000,1000,function(Value)
+    Settings.MaxDistance = Value
+end)
+
+Section("VISUALS")
+
+Toggle("ESP",false,function(Value)
+    Settings.ESP = Value
+end)
+
+Toggle("HITBOX",false,function(Value)
+    Settings.Hitbox = Value
+end)
+
+Toggle("FOV CIRCLE",true,function(Value)
+    Settings.FOVCircle = Value
+end)
+
+Slider("HITBOX SIZE",2,15,5,function(Value)
+    Settings.HitboxSize = Value
+end)
+
+--==================================================
+-- FOV CIRCLE
+--==================================================
+
+local FOVCircle = Instance.new("Frame")
+FOVCircle.AnchorPoint = Vector2.new(0.5,0.5)
+FOVCircle.BackgroundTransparency = 1
+FOVCircle.ZIndex = 2
+FOVCircle.Parent = Gui
+
+local FOVCorner = Instance.new("UICorner")
+FOVCorner.CornerRadius = UDim.new(1,0)
+FOVCorner.Parent = FOVCircle
+
+local FOVStroke = Instance.new("UIStroke")
+FOVStroke.Color = Color3.fromRGB(80,130,255)
+FOVStroke.Thickness = 1
+FOVStroke.Transparency = 0.15
+FOVStroke.Parent = FOVCircle
+
+--==================================================
+-- WALLCHECK
+--==================================================
+
+local function HasLineOfSight(TargetPart,Character)
+
+    if not Settings.Wallcheck then
+        return true
+    end
+
+    local Origin = Camera.CFrame.Position
+    local Direction = TargetPart.Position - Origin
+
+    local Params = RaycastParams.new()
+
+    Params.FilterType = Enum.RaycastFilterType.Exclude
+
+    Params.FilterDescendantsInstances = {
+        LocalPlayer.Character,
+        Camera
+    }
+
+    Params.IgnoreWater = true
+
+    local Result =
+        workspace:Raycast(
+            Origin,
+            Direction,
+            Params
+        )
+
+    if not Result then
+        return true
+    end
+
+    return Result.Instance:IsDescendantOf(Character)
+end
+
+--==================================================
+-- TARGET
+--==================================================
+
+local function GetTarget()
+
+    local Center = Vector2.new(
+        Camera.ViewportSize.X/2,
+        Camera.ViewportSize.Y/2
+    )
+
+    local BestTarget = nil
+    local BestDistance = Settings.FOV
+
+    local LocalCharacter = LocalPlayer.Character
+    local LocalRoot =
+        LocalCharacter
+        and LocalCharacter:FindFirstChild("HumanoidRootPart")
+
+    for _,Player in ipairs(Players:GetPlayers()) do
+
+        if Player ~= LocalPlayer then
+
+            local Character = Player.Character
+
+            if Character then
+
+                local Humanoid =
+                    Character:FindFirstChildOfClass("Humanoid")
+
+                local Head =
+                    Character:FindFirstChild("Head")
+
+                local Root =
+                    Character:FindFirstChild("HumanoidRootPart")
+
+                if Humanoid
+                and Humanoid.Health > 0
+                and Head
+                and Root then
+
+                    local Distance3D =
+                        (Root.Position-Camera.CFrame.Position).Magnitude
+
+                    if Distance3D <= Settings.MaxDistance then
+
+                        local Part =
+                            Settings.LockHead
+                            and Head
+                            or Root
+
+                        local Position,Visible =
+                            Camera:WorldToViewportPoint(
+                                Part.Position
+                            )
+
+                        if Visible then
+
+                            local ScreenDistance =
+                                (
+                                    Vector2.new(
+                                        Position.X,
+                                        Position.Y
+                                    )-Center
+                                ).Magnitude
+
+                            if ScreenDistance < BestDistance then
+
+                                if HasLineOfSight(
+                                    Part,
+                                    Character
+                                ) then
+
+                                    BestDistance =
+                                        ScreenDistance
+
+                                    BestTarget = Part
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    return BestTarget
+end
+
+--==================================================
+-- AIM
+--==================================================
+
+local function AimAt(Target)
+
+    if not Target then
+        return
+    end
+
+    local Origin =
+        Camera.CFrame.Position
+
+    local Desired =
+        CFrame.lookAt(
+            Origin,
+            Target.Position
+        )
+
+    Camera.CFrame =
+        Camera.CFrame:Lerp(
+            Desired,
+            math.clamp(
+                Settings.Smoothness,
+                0.01,
+                1
+            )
+        )
+end
+
+--==================================================
+-- VISUALS
+--==================================================
+
+local Visuals = {}
+
+local function RemoveVisual(Player)
+
+    if Visuals[Player] then
+
+        for _,Object in ipairs(
+            Visuals[Player]
+        ) do
+
+            pcall(function()
+                Object:Destroy()
+            end)
+        end
+
+        Visuals[Player] = nil
+    end
+end
+
+local function CreateVisual(Player)
+
+    if Player == LocalPlayer then
+        return
+    end
+
+    local Character = Player.Character
+
+    if not Character then
+        return
+    end
+
+    local Head =
+        Character:FindFirstChild("Head")
+
+    if not Head then
+        return
+    end
+
+    RemoveVisual(Player)
+
+    Visuals[Player] = {}
+
+    -- ESP
+
+    if Settings.ESP then
+
+        local Billboard =
+            Instance.new("BillboardGui")
+
+        Billboard.Size =
+            UDim2.fromOffset(180,35)
+
+        Billboard.StudsOffset =
+            Vector3.new(0,3,0)
+
+        Billboard.AlwaysOnTop = true
+        Billboard.Parent = Head
+
+        local Text =
+            Instance.new("TextLabel")
+
+        Text.Size =
+            UDim2.fromScale(1,1)
+
+        Text.BackgroundTransparency = 1
+        Text.Text = Player.Name
+        Text.TextColor3 =
+            Color3.fromRGB(255,255,255)
+
+        Text.TextStrokeTransparency = 0.4
+        Text.TextSize = 12
+        Text.Font = Enum.Font.GothamBold
+        Text.Parent = Billboard
+
+        table.insert(
+            Visuals[Player],
+            Billboard
+        )
+    end
+
+    -- HITBOX VISUAL
+
+    if Settings.Hitbox then
+
+        local Highlight =
+            Instance.new("Highlight")
+
+        Highlight.Name =
+            "LuckkssHub_Hitbox"
+
+        Highlight.FillTransparency = 0.75
+        Highlight.OutlineTransparency = 0
+
+        Highlight.Parent = Character
+
+        table.insert(
+            Visuals[Player],
+            Highlight
+        )
+    end
+end
+
+local function UpdateVisuals()
+
+    for _,Player in ipairs(
+        Players:GetPlayers()
+    ) do
+
+        if Player ~= LocalPlayer then
+
+            if Settings.ESP
+            or Settings.Hitbox then
+
+                CreateVisual(Player)
+
+            else
+
+                RemoveVisual(Player)
+            end
+        end
+    end
+end
+
+Players.PlayerRemoving:Connect(function(Player)
+
+    RemoveVisual(Player)
+end)
+
+--==================================================
+-- MINI BUTTON
+--==================================================
+
+local MiniButton =
+    Instance.new("ImageButton")
+
+MiniButton.Size =
+    UDim2.fromOffset(62,62)
+
+MiniButton.Position =
+    UDim2.new(0,25,0.5,-31)
+
+MiniButton.BackgroundColor3 =
+    Color3.fromRGB(18,18,23)
+
+MiniButton.Image =
+    ICON_ID
+
+MiniButton.ScaleType =
+    Enum.ScaleType.Crop
+
+MiniButton.AutoButtonColor = false
+MiniButton.Visible = false
+MiniButton.ZIndex = 20
+MiniButton.Parent = Gui
+
+local MiniCorner =
+    Instance.new("UICorner")
+
+MiniCorner.CornerRadius =
+    UDim.new(1,0)
+
+MiniCorner.Parent = MiniButton
+
+local MiniStroke =
+    Instance.new("UIStroke")
+
+MiniStroke.Color =
+    Color3.fromRGB(75,120,255)
+
+MiniStroke.Thickness = 2
+MiniStroke.Parent = MiniButton
+
+--==================================================
+-- MINIMIZE
+--==================================================
+
+Minimize.MouseButton1Click:Connect(function()
+
+    Main.Visible = false
+    MiniButton.Visible = true
+end)
+
+MiniButton.MouseButton1Click:Connect(function()
+
+    Main.Visible = true
+    MiniButton.Visible = false
+end)
+
+--==================================================
+-- DRAG
+--==================================================
+
+local Dragging = false
+local DragStart
+local StartPosition
+
+Header.InputBegan:Connect(function(Input)
+
+    if Input.UserInputType ==
+        Enum.UserInputType.MouseButton1
+    or Input.UserInputType ==
+        Enum.UserInputType.Touch then
+
+        Dragging = true
+
+        DragStart =
+            Input.Position
+
+        StartPosition =
+            Main.Position
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(Input)
+
+    if Dragging and (
+        Input.UserInputType ==
+            Enum.UserInputType.MouseMovement
+        or Input.UserInputType ==
+            Enum.UserInputType.Touch
+    ) then
+
+        local Delta =
+            Input.Position-DragStart
+
+        Main.Position =
+            UDim2.new(
+                StartPosition.X.Scale,
+                StartPosition.X.Offset+Delta.X,
+                StartPosition.Y.Scale,
+                StartPosition.Y.Offset+Delta.Y
+            )
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(Input)
+
+    if Input.UserInputType ==
+        Enum.UserInputType.MouseButton1
+    or Input.UserInputType ==
+        Enum.UserInputType.Touch then
+
+        Dragging = false
+    end
+end)
+
+--==================================================
+-- MAIN LOOP
+--==================================================
+
+RunService.RenderStepped:Connect(function()
+
+    FOVCircle.Visible =
+        Settings.FOVCircle
+
+    FOVCircle.Size =
+        UDim2.fromOffset(
+            Settings.FOV*2,
+            Settings.FOV*2
+        )
+
+    FOVCircle.Position =
+        UDim2.fromOffset(
+            Camera.ViewportSize.X/2,
+            Camera.ViewportSize.Y/2
+        )
+
+    if Settings.Aimbot then
+
+        local Target =
+            GetTarget()
+
+        if Target then
+            AimAt(Target)
+        end
+    end
+end)
+
+--==================================================
+-- VISUAL UPDATE
+--==================================================
+
+task.spawn(function()
+
+    while Gui.Parent do
+
+        UpdateVisuals()
+
+        task.wait(0.25)
+    end
+end)
+
+print("LuckkssHub carregado com sucesso.")
